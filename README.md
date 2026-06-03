@@ -16,7 +16,7 @@
 
 `from recipe import Ingredient, Recipe, ShoppingList, DietaryRecipe`
 
-# Тесты
+## Тесты
 
 в целях самопроверки были реализованы тесты на устойчивость к различным видам данных. Тесты в `test_recipe.py`
 
