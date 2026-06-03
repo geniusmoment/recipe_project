@@ -92,3 +92,70 @@ class TestRecipe:
         actual = len(recipe)
         expected = 2
         assert actual == expected
+
+class TestShoppingList:
+
+    def test_add_recipe(self):
+        ingredient = Ingredient("Цыпленок", 1, "шт")
+        recipe = Recipe("Ужин", [ingredient])
+        shop_list = ShoppingList()
+        shop_list.add_recipe(recipe, 2.0)
+        answer = shop_list.get_list()
+        assert len(answer) == 1
+        assert answer[0].name == "Цыпленок"
+        assert answer[0].quantity == 2.0
+
+    def test_add_invalid(self):
+        ing = Ingredient("Вода", 525252, "мл")
+        recipe = Recipe("Чай", [ing])
+        shop_list = ShoppingList()
+        invalid_portions = -2.0
+        with pytest.raises(ValueError):
+            shop_list.add_recipe(recipe, portions=invalid_portions)
+
+    def test_remove_recipe(self):
+        recipe1 = Recipe("Додо ужин", [Ingredient("Пицца", 5, "шт")])
+        recipe2 = Recipe("Тануки ужин", [Ingredient("роллы", 100, "шт")])
+        shop_list = ShoppingList()
+        shop_list.add_recipe(recipe1, portions=1)
+        shop_list.add_recipe(recipe2, portions=1)
+        shop_list.remove_recipe("Додо ужин")
+        answer = shop_list.get_list()
+        assert len(answer) == 1
+        assert answer[0].name == "роллы"
+
+    def test_remove_recipe_empty(self):
+        recipe = Recipe("Щи", [Ingredient("Капуста", 500, "г")])
+        shop_list = ShoppingList()
+        shop_list.add_recipe(recipe, portions=1)
+        shop_list.remove_recipe("Борщ")
+        answer = shop_list.get_list()
+        assert len(answer) == 1
+
+    def test_get_list_duplicate(self):
+        recipe1 = Recipe("Мохито безалкогольный", [Ingredient("Спрайт", 500, "г"), Ingredient("Мята", 299, "г")])
+        recipe2 = Recipe("Май тай", [Ingredient("Ром", 500, "г"), Ingredient("Мята", 300, "г")])
+        shop_list = ShoppingList()
+        shop_list.add_recipe(recipe1, portions=1)
+        shop_list.add_recipe(recipe2, portions=1)
+        answer = shop_list.get_list()
+        assert len(answer) == 3
+        assert answer[0].name == "Мята"
+        assert answer[1].name == "Ром"
+        assert answer[2].name == "Спрайт"
+        assert answer[0].quantity == 599.0
+
+    def test_get_list_unique(self):
+        recipe1 = Recipe("Яишница", [Ingredient("Яйца", 5, "шт")])
+        recipe2 = Recipe("Каша", [Ingredient("Овсянка", 300, "г")])
+        list1 = ShoppingList()
+        list1.add_recipe(recipe1, portions=1)
+        list2 = ShoppingList()
+        list2.add_recipe(recipe2, portions=1)
+        combined_list = list1 + list2
+        combined_answer = combined_list.get_list()
+        assert len(combined_answer) == 2
+        assert len(list1.get_list()) == 1
+        assert len(list2.get_list()) == 1
+        assert combined_list is not list1
+        assert combined_list is not list2
